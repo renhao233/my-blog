@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>迷失在金童路</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <a href="index.html" class="site-title">迷失在金童路</a>
+    <nav>
+      <a href="index.html" class="active">文章</a>
+      <a href="about.html">关于</a>
+    </nav>
+  </header>
+
+  <main>
+    <ul class="post-list" id="post-list">
+      <li class="post-item"><p class="post-excerpt">加载中...</p></li>
+    </ul>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 迷失在金童路 · Powered by plain HTML</p>
+  </footer>
+
+  <script>
+    async function loadPosts() {
+      try {
+        const resp = await fetch('posts.json');
+        const posts = await resp.json();
+        const list = document.getElementById('post-list');
+        list.innerHTML = '';
+
+        posts.forEach(p => {
+          const li = document.createElement('li');
+          li.className = 'post-item';
+          li.innerHTML = `
+            <div class="post-date">${p.date}</div>
+            <div class="post-title">
+              <a href="post.html?slug=${p.slug}">${p.title}</a>
+            </div>
+            <p class="post-excerpt">${p.excerpt || ''}</p>
+          `;
+          list.appendChild(li);
+        });
+
+        if (posts.length === 0) {
+          list.innerHTML = '<li class="post-item"><p class="post-excerpt">暂无文章</p></li>';
+        }
+      } catch (e) {
+        document.getElementById('post-list').innerHTML =
+          `<li class="post-item"><p class="post-excerpt">加载失败: ${e.message}</p></li>`;
+      }
+    }
+    loadPosts();
+  </script>
+</body>
+</html>
