@@ -1,18 +1,18 @@
 [
   {
-    "slug": "terminal-workflow",
+    "slug": "2026/terminal-workflow-2026-07-05",
     "title": "我的终端工作流：从零到高效",
     "date": "2026-07-05",
     "excerpt": "分享一套经过多年打磨的命令行工作流，涵盖终端复用器、shell 配置、常用工具链，以及如何让终端变成真正的生产力工具。"
   },
   {
-    "slug": "static-site",
+    "slug": "2026/static-site-2026-06-28",
     "title": "为什么我选择纯静态博客",
     "date": "2026-06-28",
     "excerpt": "从 WordPress 到 Hugo，再到手写 HTML，聊一聊为什么有时候最笨的方法反而是最好的选择。"
   },
   {
-    "slug": "learning-rust",
+    "slug": "2026/learning-rust-2026-06-20",
     "title": "学 Rust 的第一年",
     "date": "2026-06-20",
     "excerpt": "从零开始学 Rust 的心路历程：编译器教会我的那些事，以及什么时候该用 Rust、什么时候不该用。"
