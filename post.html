@@ -3,22 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="page-title">文章</title>
+  <!-- 标题：文章加载后 JS 会动态更新 -->
+  <title id="page-title">文章 · 迷失在金童路</title>
+  <!-- 基础 SEO -->
   <meta name="description" id="page-desc" content="迷失在金童路 — 记录技术、思考与生活的个人博客。">
-  <meta name="keywords" content="技术博客,个人博客,编程,代码,思考">
+  <meta name="keywords" id="page-keywords" content="技术博客,个人博客,编程,代码,思考">
   <meta name="author" content="迷失在金童路">
   <meta name="robots" content="index, follow">
   <link rel="canonical" id="page-canonical" href="https://cqlrh.cn/post.html">
+  <!-- Open Graph -->
   <meta property="og:title" id="og-title" content="迷失在金童路">
   <meta property="og:description" id="og-desc" content="记录技术、思考与生活的个人博客。">
   <meta property="og:type" content="article">
   <meta property="og:url" id="og-url" content="https://cqlrh.cn/post.html">
   <meta property="og:site_name" content="迷失在金童路">
-  <meta property="og:image" content="https://cqlrh.cn/assets/logo-4-terminal-path.svg">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" id="og-image" content="https://cqlrh.cn/assets/logo-4-terminal-path.svg">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="article:published_time" id="article-published" content="">
+  <meta property="article:author" content="迷失在金童路">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" id="twitter-card" content="summary">
+  <meta name="twitter:title" id="twitter-title" content="迷失在金童路">
+  <meta name="twitter:description" id="twitter-desc" content="记录技术、思考与生活的个人博客。">
+  <meta name="twitter:image" id="twitter-image" content="https://cqlrh.cn/assets/logo-4-terminal-path.svg">
+  <!-- 资源 -->
   <link rel="icon" type="image/svg+xml" href="../assets/logo-4-terminal-path.svg">
   <link rel="stylesheet" href="../style.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- 结构化数据（JSON-LD），文章加载后 JS 会动态填充 -->
+  <script type="application/ld+json" id="ld-json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "迷失在金童路",
+    "description": "记录技术、思考与生活的个人博客。",
+    "url": "https://cqlrh.cn/post.html"
+  }
+  </script>
 </head>
 <body>
   <header>
@@ -49,53 +70,107 @@
   </footer>
 
   <script>
-      async function loadPost() {
-        const params = new URLSearchParams(window.location.search);
-        const slug = params.get('slug');
-        if (!slug) {
-          document.getElementById('post-body').innerHTML = '<p>未指定文章</p>';
-          return;
-        }
-
-        try {
-          const resp = await fetch(`../posts/${slug}.md`);
-          if (!resp.ok) throw new Error('文章不存在');
-          const raw = await resp.text();
-
-          // 解析元数据
-          const meta = {};
-          let body = raw.replace(/<!--\s*(\w+):\s*(.+?)\s*-->/g, (_, key, val) => {
-            meta[key] = val;
-            return '';
-          }).trim();
-
-          // 渲染 Markdown
-          const title = meta.title || slug;
-          document.getElementById('post-title').textContent = title;
-          document.getElementById('page-title').textContent = title + ' · 迷失在金童路';
-          document.getElementById('post-meta').textContent = meta.date || '';
-          document.getElementById('post-body').innerHTML = marked.parse(body);
-
-          // 提取描述：优先用 meta.excerpt / meta.desc，否则取正文第一段纯文本
-          let desc = meta.excerpt || meta.desc || '';
-          if (!desc) {
-            const firstP = document.querySelector('#post-body p');
-            if (firstP) desc = firstP.textContent.trim();
-          }
-          if (desc.length > 200) desc = desc.slice(0, 197) + '...';
-
-          // 更新 SEO meta 标签
-          const canonical = 'https://cqlrh.cn/post.html?slug=' + encodeURIComponent(slug);
-          document.getElementById('page-desc').setAttribute('content', desc || title);
-          document.getElementById('page-canonical').setAttribute('href', canonical);
-          document.getElementById('og-title').setAttribute('content', title + ' · 迷失在金童路');
-          document.getElementById('og-desc').setAttribute('content', desc || title);
-          document.getElementById('og-url').setAttribute('content', canonical);
-        } catch (e) {
-          document.getElementById('post-body').innerHTML = `<p>加载失败: ${e.message}</p>`;
-        }
+    /**
+     * 从 Markdown 文章加载内容，并动态更新所有 SEO meta 标签
+     * 支持的 frontmatter 字段（HTML 注释格式）：
+     *   title, date, excerpt, keywords, image, tags
+     * 示例：
+     *   <!-- title: 我的文章 -->
+     *   <!-- keywords: Rust, 编程语言, 学习笔记 -->
+     *   <!-- image: assets/rust-logo.png -->
+     *   <!-- tags: Rust, 编程 -->
+     */
+    async function loadPost() {
+      const params = new URLSearchParams(window.location.search);
+      const slug = params.get('slug');
+      if (!slug) {
+        document.getElementById('post-body').innerHTML = '<p>未指定文章</p>';
+        return;
       }
-      loadPost();
-    </script>
+
+      try {
+        const resp = await fetch(`../posts/${slug}.md`);
+        if (!resp.ok) throw new Error('文章不存在');
+        const raw = await resp.text();
+
+        // 解析元数据（HTML 注释格式的 frontmatter）
+        const meta = {};
+        let body = raw.replace(/<!--\s*(\w+):\s*(.+?)\s*-->/g, (_, key, val) => {
+          meta[key] = val;
+          return '';
+        }).trim();
+
+        // 渲染 Markdown
+        const title = meta.title || slug;
+        document.getElementById('post-title').textContent = title;
+        document.getElementById('page-title').textContent = title + ' · 迷失在金童路';
+        document.getElementById('post-meta').textContent = meta.date || '';
+        document.getElementById('post-body').innerHTML = marked.parse(body);
+
+        // 提取描述：优先用 meta.excerpt，其次 meta.desc，再取正文第一段
+        let desc = meta.excerpt || meta.desc || '';
+        if (!desc) {
+          const firstP = document.querySelector('#post-body p');
+          if (firstP) desc = firstP.textContent.trim();
+        }
+        if (desc.length > 200) desc = desc.slice(0, 197) + '...';
+
+        // 规范 URL
+        const canonical = 'https://cqlrh.cn/post.html?slug=' + encodeURIComponent(slug);
+
+        // 文章配图：优先用 meta.image，否则用默认 logo
+        const ogImage = meta.image
+          ? 'https://cqlrh.cn/' + meta.image.replace(/^\//, '')
+          : 'https://cqlrh.cn/assets/logo-4-terminal-path.svg';
+
+        // 关键词：优先用 meta.keywords，否则用 meta.tags，都没有用默认值
+        const keywords = meta.keywords || meta.tags || '技术博客,个人博客';
+        // Twitter Card 类型：有自定义图片用 summary_large_image，否则用 summary
+        const twitterCard = meta.image ? 'summary_large_image' : 'summary';
+
+        // ── 更新所有 SEO meta 标签 ──
+        // 基础 SEO
+        document.getElementById('page-desc').setAttribute('content', desc || title);
+        document.getElementById('page-keywords').setAttribute('content', keywords);
+        document.getElementById('page-canonical').setAttribute('href', canonical);
+
+        // Open Graph
+        document.getElementById('og-title').setAttribute('content', title + ' · 迷失在金童路');
+        document.getElementById('og-desc').setAttribute('content', desc || title);
+        document.getElementById('og-url').setAttribute('content', canonical);
+        document.getElementById('og-image').setAttribute('content', ogImage);
+        if (meta.date) {
+          document.getElementById('article-published').setAttribute('content', meta.date);
+        }
+
+        // Twitter Card
+        document.getElementById('twitter-card').setAttribute('content', twitterCard);
+        document.getElementById('twitter-title').setAttribute('content', title + ' · 迷失在金童路');
+        document.getElementById('twitter-desc').setAttribute('content', desc || title);
+        document.getElementById('twitter-image').setAttribute('content', ogImage);
+
+        // JSON-LD 结构化数据
+        const ldJson = {
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          'headline': title,
+          'description': desc || title,
+          'datePublished': meta.date || '',
+          'url': canonical,
+          'image': ogImage,
+          'author': { '@type': 'Person', 'name': '迷失在金童路' },
+          'publisher': { '@type': 'Person', 'name': '迷失在金童路' }
+        };
+        // 如果有 tags 字段，加到结构化数据
+        if (meta.tags) {
+          ldJson.keywords = meta.tags.split(',').map(t => t.trim());
+        }
+        document.getElementById('ld-json').textContent = JSON.stringify(ldJson, null, 2);
+      } catch (e) {
+        document.getElementById('post-body').innerHTML = `<p>加载失败: ${e.message}</p>`;
+      }
+    }
+    loadPost();
+  </script>
 </body>
 </html>

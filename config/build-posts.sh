@@ -9,6 +9,9 @@
 #    <!-- title: 文章标题 -->
 #    <!-- date: 2026-07-05 -->
 #    <!-- excerpt: 一句话摘要 -->
+#    <!-- keywords: Rust, 编程语言, 学习笔记    （可选，SEO 关键词） -->
+#    <!-- image: assets/rust-logo.png           （可选，OG/Twitter 配图） -->
+#    <!-- tags: Rust, 编程                      （可选，文章标签） -->
 # ============================================================
 
 # 遇到错误立即退出，避免半成品
@@ -52,6 +55,9 @@ for md in $(find "$POSTS_DIR" -name "*.md" | sort); do
   title=$(grep -oP '<!--\s*title:\s*\K.*?(?=\s*-->)' "$md" | head -1 | sed 's/[[:space:]]*$//')
   date=$(grep -oP '<!--\s*date:\s*\K.*?(?=\s*-->)' "$md" | head -1 | sed 's/[[:space:]]*$//')
   excerpt=$(grep -oP '<!--\s*excerpt:\s*\K.*?(?=\s*-->)' "$md" | head -1 | sed 's/[[:space:]]*$//')
+  keywords=$(grep -oP '<!--\s*keywords:\s*\K.*?(?=\s*-->)' "$md" | head -1 | sed 's/[[:space:]]*$//')
+  image=$(grep -oP '<!--\s*image:\s*\K.*?(?=\s*-->)' "$md" | head -1 | sed 's/[[:space:]]*$//')
+  tags=$(grep -oP '<!--\s*tags:\s*\K.*?(?=\s*-->)' "$md" | head -1 | sed 's/[[:space:]]*$//')
 
   # 如果没有写 title，就用文件名当标题
   [ -z "$title" ] && title="$slug"
@@ -68,7 +74,7 @@ for md in $(find "$POSTS_DIR" -name "*.md" | sort); do
 
   # heredoc 方式写入一条 JSON 记录
   cat >> "$OUTPUT" << EOF
-  { "slug": "$slug", "title": "$title", "date": "$date", "excerpt": "$excerpt" }
+  { "slug": "$slug", "title": "$title", "date": "$date", "excerpt": "$excerpt", "keywords": "$keywords", "image": "$image", "tags": "$tags" }
 EOF
 done
 
