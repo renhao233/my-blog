@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="page-title">文章</title>
+  <meta name="description" id="page-desc" content="迷失在金童路 — 记录技术、思考与生活的个人博客。">
+  <meta name="keywords" content="技术博客,个人博客,编程,代码,思考">
+  <meta name="author" content="迷失在金童路">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" id="page-canonical" href="https://cqlrh.cn/post.html">
+  <meta property="og:title" id="og-title" content="迷失在金童路">
+  <meta property="og:description" id="og-desc" content="记录技术、思考与生活的个人博客。">
+  <meta property="og:type" content="article">
+  <meta property="og:url" id="og-url" content="https://cqlrh.cn/post.html">
+  <meta property="og:site_name" content="迷失在金童路">
+  <meta property="og:image" content="https://cqlrh.cn/assets/logo-4-terminal-path.svg">
+  <meta name="twitter:card" content="summary">
   <link rel="icon" type="image/svg+xml" href="../assets/logo-4-terminal-path.svg">
   <link rel="stylesheet" href="../style.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -37,36 +49,53 @@
   </footer>
 
   <script>
-    async function loadPost() {
-      const params = new URLSearchParams(window.location.search);
-      const slug = params.get('slug');
-      if (!slug) {
-        document.getElementById('post-body').innerHTML = '<p>未指定文章</p>';
-        return;
+      async function loadPost() {
+        const params = new URLSearchParams(window.location.search);
+        const slug = params.get('slug');
+        if (!slug) {
+          document.getElementById('post-body').innerHTML = '<p>未指定文章</p>';
+          return;
+        }
+
+        try {
+          const resp = await fetch(`../posts/${slug}.md`);
+          if (!resp.ok) throw new Error('文章不存在');
+          const raw = await resp.text();
+
+          // 解析元数据
+          const meta = {};
+          let body = raw.replace(/<!--\s*(\w+):\s*(.+?)\s*-->/g, (_, key, val) => {
+            meta[key] = val;
+            return '';
+          }).trim();
+
+          // 渲染 Markdown
+          const title = meta.title || slug;
+          document.getElementById('post-title').textContent = title;
+          document.getElementById('page-title').textContent = title + ' · 迷失在金童路';
+          document.getElementById('post-meta').textContent = meta.date || '';
+          document.getElementById('post-body').innerHTML = marked.parse(body);
+
+          // 提取描述：优先用 meta.excerpt / meta.desc，否则取正文第一段纯文本
+          let desc = meta.excerpt || meta.desc || '';
+          if (!desc) {
+            const firstP = document.querySelector('#post-body p');
+            if (firstP) desc = firstP.textContent.trim();
+          }
+          if (desc.length > 200) desc = desc.slice(0, 197) + '...';
+
+          // 更新 SEO meta 标签
+          const canonical = 'https://cqlrh.cn/post.html?slug=' + encodeURIComponent(slug);
+          document.getElementById('page-desc').setAttribute('content', desc || title);
+          document.getElementById('page-canonical').setAttribute('href', canonical);
+          document.getElementById('og-title').setAttribute('content', title + ' · 迷失在金童路');
+          document.getElementById('og-desc').setAttribute('content', desc || title);
+          document.getElementById('og-url').setAttribute('content', canonical);
+        } catch (e) {
+          document.getElementById('post-body').innerHTML = `<p>加载失败: ${e.message}</p>`;
+        }
       }
-
-      try {
-        const resp = await fetch(`../posts/${slug}.md`);
-        if (!resp.ok) throw new Error('文章不存在');
-        const raw = await resp.text();
-
-        // 解析元数据
-        const meta = {};
-        let body = raw.replace(/<!--\s*(\w+):\s*(.+?)\s*-->/g, (_, key, val) => {
-          meta[key] = val;
-          return '';
-        }).trim();
-
-        // 渲染 Markdown
-        document.getElementById('post-title').textContent = meta.title || slug;
-        document.getElementById('page-title').textContent = (meta.title || slug) + ' · 迷失在金童路';
-        document.getElementById('post-meta').textContent = meta.date || '';
-        document.getElementById('post-body').innerHTML = marked.parse(body);
-      } catch (e) {
-        document.getElementById('post-body').innerHTML = `<p>加载失败: ${e.message}</p>`;
-      }
-    }
-    loadPost();
-  </script>
+      loadPost();
+    </script>
 </body>
 </html>
