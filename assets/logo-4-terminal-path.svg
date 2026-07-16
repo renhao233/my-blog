@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- 终端之路：终端提示符 > 加一条延伸的路径，融合技术与"路"的主题 -->
+  <polyline points="45,55 75,80 45,105" stroke="#0d6e6e" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M95,80 L155,80" stroke="#0d6e6e" stroke-width="5" stroke-linecap="round" stroke-dasharray="8,8"/>
+  <path d="M60,140 Q100,120 140,140 T180,140" stroke="#0d6e6e" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+</svg>
