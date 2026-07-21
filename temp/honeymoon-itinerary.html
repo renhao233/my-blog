@@ -139,6 +139,11 @@
     font-size: 0.85em; margin-top: 8px; color: #1a6b8a; border: 1px solid #d0eaf5;
   }
 
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   table { width: 100%; border-collapse: collapse; font-size: 0.93em; }
   th {
     text-align: left; padding: 10px 14px; background: var(--ocean-light);
@@ -224,9 +229,8 @@
     .hotel { font-size: 0.78em; }
     .transport { font-size: 0.78em; padding: 6px 10px; }
 
-    /* 表格：横向滚动 */
-    .section:has(table) { padding: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    table { font-size: 0.78em; white-space: nowrap; min-width: 600px; }
+    /* 表格 */
+    table { font-size: 0.78em; }
     th, td { padding: 6px 8px; }
     th { border-radius: 6px 6px 0 0; }
 
@@ -604,7 +608,7 @@
       💡 <strong>怎么读：</strong>「✔️ 已核实」= 数据平台实时价格。「🔍 参考价」= 基于航线行情的估算，建议核实。<br>
       所有价格为<strong>单人含税参考价</strong>，实际以预订时为准。提前 4-6 周订票通常最便宜。
     </div>
-    <table>
+    <div class="table-wrap"><table>
       <thead>
         <tr><th>段</th><th>日期</th><th>航班号</th><th>航司</th><th>出发→抵达</th><th>耗时</th><th>频次</th><th style="text-align:right">参考价/人</th></tr>
       </thead>
@@ -642,13 +646,13 @@
         <tr class="subtotal"><td colspan="7"><strong>机票参考合计（单人）</strong></td><td style="text-align:right"><strong>≈3,750-4,450</strong></td></tr>
         <tr class="subtotal"><td colspan="7"><strong>机票参考合计（2人）</strong></td><td style="text-align:right"><strong>≈7,500-8,900</strong></td></tr>
       </tbody>
-    </table>
+    </table></div>
   </div>
 
   <!-- 费用明细 -->
   <div class="section">
     <h2>💰 费用明细（2人合计）</h2>
-    <table>
+    <div class="table-wrap"><table>
       <thead>
         <tr><th>项目</th><th style="text-align:right">参考单价</th><th style="text-align:center">数量</th><th style="text-align:right">参考金额</th></tr>
       </thead>
@@ -673,7 +677,7 @@
         <tr><td>每日餐饮+交通+门票</td><td style="text-align:right">≈500元/天</td><td style="text-align:center">13天</td><td style="text-align:right">6,500</td></tr>
         <tr class="total-row"><td><strong>🎯 总计</strong></td><td style="text-align:right"></td><td style="text-align:center"></td><td style="text-align:right"><strong>≈17,960元</strong></td></tr>
       </tbody>
-    </table>
+    </table></div>
     <p style="text-align:center; margin-top:14px; color:var(--green); font-weight:600;">
       ✅ 预算约 17,960 元，在 2-3万元目标内，还有 2,040-12,040元弹性空间
     </p>
